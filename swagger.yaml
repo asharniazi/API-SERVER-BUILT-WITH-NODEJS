@@ -1,0 +1,165 @@
+openapi: 3.0.1
+info:
+  title: Swagger RestFul WS
+  description: 'This is a sample server Petstore server.  You can find out more about     Swagger
+    at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For
+    this sample, you can use the api key `special-key` to test the authorization     filters.'
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: http://localhost:5000
+
+
+tags:
+- name: user
+  description: Operations about user
+  externalDocs:
+    description: Find out more about our store
+    url: http://localhost:5000
+
+
+paths:
+
+# create user
+  /rest/user/create:
+    post:
+      tags:
+      - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+# Get List of all Users
+  /rest/users:
+    get:
+      security:
+      - JWT: []
+      tags:
+      - user
+      summary: Get list of users
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid user input
+          content: {}
+        404:
+          description: User not found
+          content: {}
+# Update User by Login ID
+  /rest/user/update/{loginId}:
+    put:
+      security:
+      - JWT: []
+      tags:
+      - user
+      summary: Update first name and last name of an existing user
+      operationId: updateUser
+      parameters:
+      - name: loginId
+        in: path
+        description: ID of user that needs to be update
+        required: true
+      requestBody:
+        description: User object that needs to be update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+        required: true
+      responses:
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: User not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}
+      x-codegen-request-body-name: body
+  /rest/user/delete/{loginId}:
+    delete:
+      security:
+      - JWT: []
+      tags:
+      - user
+      summary: Delete user order by login id
+      operationId: deleteUser
+      parameters:
+      - name: loginId
+        in: path
+        description: ID of the user that needs to be deleted
+        required: true
+        schema:
+          minimum: 1
+          type: string
+      responses:
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: user not found
+          content: {}
+components:
+  schemas:
+    UpdateUser:
+      type: object
+      properties:
+        FIRST_NAME:
+          type: string
+        LAST_NAME:
+          type: string
+    User:
+      type: object
+      properties:
+        USER_ID:
+          type: integer
+          format: int64
+        LOGIN_ID:
+          type: string
+        FIRST_NAME:
+          type: string
+        LAST_NAME:
+          type: string
+        DOB:
+          type: string
+        STATUS:
+          type: integer
+        CREATION_DATE:
+          type: string
+
+  securitySchemes:
+    JWT:
+      type: apiKey
+      in: header
+      name: x-access-token
+
+
+  security:
+    - JWT: []
